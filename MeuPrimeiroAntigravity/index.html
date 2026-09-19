@@ -1,12 +1,40 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Primeiro Antigravity</title>
+    <title>Meu Dia - Lista de Tarefas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>Ola, Mundo!!!!</h2>
-    <p>Seja, Bem-Vindo</p>
+    <main class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">Meu Dia</h1>
+            <p class="app-subtitle" id="data-atual"></p>
+        </header>
+
+        <form class="task-form" id="form-tarefa">
+            <input 
+                type="text" 
+                id="input-tarefa" 
+                class="task-input" 
+                placeholder="Qual é a sua tarefa para hoje?" 
+                autocomplete="off"
+            >
+            <button type="submit" class="btn-adicionar" id="btn-adicionar">Adicionar</button>
+        </form>
+
+        <section class="task-list-container">
+            <ul class="task-list" id="lista-tarefas">
+                <!-- As tarefas serão inseridas dinamicamente aqui -->
+            </ul>
+            <p class="empty-state" id="empty-state">Nenhuma tarefa para hoje. Que tal adicionar uma?</p>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>

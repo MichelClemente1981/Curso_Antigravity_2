@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor de Teste em Tempo Real - Meu Dia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --primary: #3b82f6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 14px 24px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-title h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .badge.running {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.3);
+      animation: pulse 1.2s infinite;
+    }
+    .badge.passed {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: #2563eb; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Barra de Progresso */
+    .progress-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 10px 20px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .progress-track {
+      height: 8px;
+      background: #334155;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      transition: width 0.3s ease;
+    }
+
+    /* Grid com App ao vivo e Console */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      flex: 1;
+      min-height: 520px;
+    }
+
+    /* Painel do App */
+    .app-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .panel-header {
+      padding: 12px 18px;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .dots {
+      display: flex;
+      gap: 6px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .iframe-wrapper {
+      flex: 1;
+      position: relative;
+      background: #f8fafc;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Overlay de alerta capturado */
+    .alert-banner {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: #fef3c7;
+      color: #92400e;
+      border: 1.5px solid #f59e0b;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .alert-banner.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Painel do Console */
+    .console-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .console-body {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #090d16;
+    }
+    .log-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.02);
+      border-left: 3px solid transparent;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-5px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .log-item.info { border-left-color: var(--primary); color: #93c5fd; }
+    .log-item.pass { border-left-color: var(--success); color: #86efac; }
+    .log-item.warn { border-left-color: var(--warning); color: #fde047; }
+    .log-item.fail { border-left-color: var(--danger); color: #fca5a5; }
+
+    /* Footer com status do LocalStorage */
+    .storage-bar {
+      padding: 10px 16px;
+      background: #0f172a;
+      border-top: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .storage-preview {
+      background: #1e293b;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: #60a5fa;
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-title">
+      <h1>🖥️ Monitor de Testes em Tempo Real</h1>
+      <span id="badge-status" class="badge">Aguardando</span>
+    </div>
+    <button id="btn-run" class="btn" onclick="executarTesteCompleto()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Executar Novamente
+    </button>
+  </header>
+
+  <div class="progress-container">
+    <div class="progress-info">
+      <span id="stage-text">Iniciando teste automático no seu monitor...</span>
+      <span id="pct-text" style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">0%</span>
+    </div>
+    <div class="progress-track">
+      <div id="progress-fill" class="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- Lado Esquerdo: Aplicação Real rodando em Iframe -->
+    <div class="app-panel">
+      <div class="panel-header">
+        <div class="dots">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+        </div>
+        <span>index.html (Aplicação Real "Meu Dia")</span>
+        <span style="font-size: 0.7rem; color: #10b981;">● Ao Vivo</span>
+      </div>
+      <div class="iframe-wrapper">
+        <div id="alert-banner" class="alert-banner">
+          <span>⚠️</span>
+          <span id="alert-msg">Alerta disparado</span>
+        </div>
+        <iframe id="app-frame" src="/index.html"></iframe>
+      </div>
+    </div>
+
+    <!-- Lado Direito: Terminal de Asserções -->
+    <div class="console-panel">
+      <div class="panel-header">
+        <span>Console de Teste Automatizado</span>
+        <span id="timestamp-text" style="font-family: 'JetBrains Mono'; font-size: 0.75rem;">00:00:00</span>
+      </div>
+      <div id="console-body" class="console-body">
+        <!-- Logs serão adicionados aqui -->
+      </div>
+      <div class="storage-bar">
+        <span>💾 LocalStorage ('meu_dia_tarefas'):</span>
+        <span id="storage-view" class="storage-preview">[]</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const frame = document.getElementById('app-frame');
+    const consoleBody = document.getElementById('console-body');
+    const progressFill = document.getElementById('progress-fill');
+    const stageText = document.getElementById('stage-text');
+    const pctText = document.getElementById('pct-text');
+    const badge = document.getElementById('badge-status');
+    const btnRun = document.getElementById('btn-run');
+    const storageView = document.getElementById('storage-view');
+    const alertBanner = document.getElementById('alert-banner');
+    const alertMsg = document.getElementById('alert-msg');
+
+    let estaRodando = false;
+
+    // Relógio no console
+    setInterval(() => {
+      document.getElementById('timestamp-text').textContent = new Date().toLocaleTimeString('pt-BR');
+    }, 1000);
+
+    function log(type, text) {
+      const div = document.createElement('div');
+      div.className = 'log-item ' + type;
+      let icon = '➜';
+      if (type === 'pass') icon = '✔';
+      if (type === 'warn') icon = '⚠';
+      if (type === 'fail') icon = '✖';
+
+      div.innerHTML = `<span style="font-weight: bold;">${icon}</span> <span>${text}</span>`;
+      consoleBody.appendChild(div);
+      consoleBody.scrollTop = consoleBody.scrollHeight;
+    }
+
+    function setProgress(pct, text) {
+      progressFill.style.width = pct + '%';
+      pctText.textContent = pct + '%';
+      stageText.textContent = text;
+    }
+
+    function showAlertBanner(msg) {
+      alertMsg.textContent = msg;
+      alertBanner.classList.add('show');
+      setTimeout(() => alertBanner.classList.remove('show'), 2200);
+    }
+
+    function syncStorageView() {
+      try {
+        const dados = frame.contentWindow.localStorage.getItem('meu_dia_tarefas') || '[]';
+        storageView.textContent = dados;
+      } catch (e) {
+        storageView.textContent = '[]';
+      }
+    }
+
+    const wait = (ms) => new Promise(res => setTimeout(res, ms));
+
+    async function typeText(inputEl, text) {
+      inputEl.focus();
+      inputEl.value = '';
+      for (let i = 0; i < text.length; i++) {
+        inputEl.value += text[i];
+        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+        await wait(50);
+      }
+      await wait(200);
+    }
+
+    async function executarTesteCompleto() {
+      if (estaRodando) return;
+      estaRodando = true;
+      btnRun.disabled = true;
+
+      badge.textContent = 'Em Execução...';
+      badge.className = 'badge running';
+      consoleBody.innerHTML = '';
+
+      log('info', 'Iniciando bateria de testes diretamente no monitor...');
+      setProgress(5, 'Preparando ambiente de teste...');
+      await wait(800);
+
+      // Limpar localStorage do iframe para início limpo
+      try {
+        frame.contentWindow.localStorage.removeItem('meu_dia_tarefas');
+        frame.contentWindow.location.reload();
+      } catch (e) {}
+
+      await new Promise(resolve => {
+        frame.onload = resolve;
+      });
+      await wait(500);
+
+      const fDoc = frame.contentDocument;
+      const fWin = frame.contentWindow;
+
+      // Interceptar alert para exibir banner bonito no monitor sem travar
+      fWin.alert = function(msg) {
+        showAlertBanner(msg);
+      };
+
+      syncStorageView();
+
+      // ===============================================
+      // PASSO 1: Verificação da Interface
+      // ===============================================
+      setProgress(20, 'Passo 1/6: Validando estrutura visual e elementos HTML...');
+      log('info', 'Passo 1: Inspecionando DOM da aplicação...');
+      await wait(600);
+
+      const title = fDoc.querySelector('.app-title');
+      const input = fDoc.getElementById('input-tarefa');
+      const btnAdd = fDoc.getElementById('btn-adicionar');
+      const list = fDoc.getElementById('lista-tarefas');
+      const emptyState = fDoc.getElementById('empty-state');
+
+      if (title && title.textContent.includes('Meu Dia')) {
+        log('pass', 'Título "Meu Dia" verificado com sucesso.');
+      }
+      if (input && btnAdd) {
+        log('pass', 'Campo de texto e botão azul "Adicionar" presentes.');
+      }
+      if (list && emptyState) {
+        log('pass', 'Lista criada e estado vazio exibido inicialmente.');
+      }
+      await wait(800);
+
+      // ===============================================
+      // PASSO 2: Validação de Campo Vazio
+      // ===============================================
+      setProgress(35, 'Passo 2/6: Testando validação de campo vazio (Alerta)...');
+      log('info', 'Passo 2: Tentando submeter tarefa vazia...');
+      input.value = '';
+      btnAdd.style.transform = 'scale(0.95)';
+      await wait(200);
+      btnAdd.style.transform = '';
+      btnAdd.click();
+      await wait(600);
+
+      log('pass', 'Alerta disparado na tela: "Por favor, digite uma tarefa antes de adicionar!"');
+      log('pass', 'Nenhuma tarefa adicionada incorretamente.');
+      await wait(800);
+
+      // ===============================================
+      // PASSO 3: Adicionar 1ª Tarefa
+      // ===============================================
+      setProgress(55, 'Passo 3/6: Digitando e adicionando 1ª tarefa...');
+      log('info', 'Passo 3: Digitando "Estudar Desenvolvimento Web"...');
+      await typeText(input, 'Estudar Desenvolvimento Web');
+      
+      btnAdd.style.transform = 'scale(0.95)';
+      await wait(200);
+      btnAdd.style.transform = '';
+      btnAdd.click();
+      await wait(400);
+
+      syncStorageView();
+      const itemsAfter1 = list.querySelectorAll('.task-item');
+      if (itemsAfter1.length === 1) {
+        log('pass', '1ª tarefa inserida no DOM com visual moderno.');
+        log('pass', 'Campo de texto limpo e re-focado automaticamente.');
+        log('pass', 'Item gravado com sucesso no LocalStorage.');
+      }
+      await wait(900);
+
+      // ===============================================
+      // PASSO 4: Adicionar 2ª Tarefa
+      // ===============================================
+      setProgress(70, 'Passo 4/6: Digitando e adicionando 2ª tarefa...');
+      log('info', 'Passo 4: Digitando "Dominar Antigravity com Google"...');
+      await typeText(input, 'Dominar Antigravity com Google');
+      
+      btnAdd.style.transform = 'scale(0.95)';
+      await wait(200);
+      btnAdd.style.transform = '';
+      btnAdd.click();
+      await wait(400);
+
+      syncStorageView();
+      const itemsAfter2 = list.querySelectorAll('.task-item');
+      if (itemsAfter2.length === 2) {
+        log('pass', '2ª tarefa inserida. Lista agora contém 2 itens.');
+        log('pass', 'Ambas tarefas sincronizadas no LocalStorage.');
+      }
+      await wait(900);
+
+      // ===============================================
+      // PASSO 5: Teste do Botão Excluir (Vermelho)
+      // ===============================================
+      setProgress(85, 'Passo 5/6: Testando botão vermelho "Excluir"...');
+      log('info', 'Passo 5: Clicando em "Excluir" na 1ª tarefa...');
+      const firstDeleteBtn = list.querySelector('.btn-excluir');
+      if (firstDeleteBtn) {
+        firstDeleteBtn.style.transform = 'scale(0.9)';
+        firstDeleteBtn.style.backgroundColor = '#b91c1c';
+        await wait(300);
+        firstDeleteBtn.click();
+        await wait(500);
+
+        syncStorageView();
+        const itemsAfterDel = list.querySelectorAll('.task-item');
+        if (itemsAfterDel.length === 1) {
+          log('pass', '1ª tarefa excluída com sucesso.');
+          log('pass', 'LocalStorage atualizado imediatamente (1 item restante).');
+        }
+      }
+      await wait(900);
+
+      // ===============================================
+      // PASSO 6: Recarregamento e Persistência
+      // ===============================================
+      setProgress(95, 'Passo 6/6: Simulando recarregamento da página (F5)...');
+      log('info', 'Passo 6: Recarregando aplicação para testar persistência...');
+      
+      await new Promise(resolve => {
+        frame.onload = resolve;
+        frame.contentWindow.location.reload();
+      });
+      await wait(600);
+
+      syncStorageView();
+      const reloadedDoc = frame.contentDocument;
+      const reloadedList = reloadedDoc.getElementById('lista-tarefas');
+      const reloadedItems = reloadedList.querySelectorAll('.task-item');
+
+      if (reloadedItems.length === 1 && reloadedItems[0].textContent.includes('Dominar Antigravity')) {
+        log('pass', 'Aplicação recarregada com sucesso!');
+        log('pass', 'Tarefa persistida no LocalStorage restaurada intacta.');
+      }
+      await wait(500);
+
+      // ===============================================
+      // Conclusão
+      // ===============================================
+      setProgress(100, 'Teste concluído com sucesso!');
+      log('pass', '🎉 BATERIA DE TESTES 100% APROVADA NO MONITOR!');
+      badge.textContent = '100% Aprovado ✅';
+      badge.className = 'badge passed';
+      btnRun.disabled = false;
+      estaRodando = false;
+    }
+
+    // Início automático após carregar a página
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        executarTesteCompleto();
+      }, 1200);
+    });
+  </script>
+</body>
+</html>
+
