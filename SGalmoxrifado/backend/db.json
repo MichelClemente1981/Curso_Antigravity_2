@@ -1,0 +1,51 @@
+{
+  "usuarios": [
+    {
+      "id": "1",
+      "nome": "Carlos Silva",
+      "cargo": "Admin"
+    },
+    {
+      "id": "2",
+      "nome": "Mariana Souza",
+      "cargo": "Operador"
+    }
+  ],
+  "produtos": [
+    {
+      "id": "1",
+      "nome": "Parafuso Sextavado M8",
+      "sku": "PAR-M8-001",
+      "quantidade_estoque": 150
+    },
+    {
+      "id": "2",
+      "nome": "Chave de Fenda Cruzada",
+      "sku": "FER-CFD-002",
+      "quantidade_estoque": 25
+    },
+    {
+      "id": "3",
+      "nome": "Fita Isolante 20m",
+      "sku": "ELE-FIT-003",
+      "quantidade_estoque": 10
+    },
+    {
+      "nome": "martelo",
+      "sku": "mto-1234",
+      "quantidade_estoque": 10,
+      "id": "L-em5sMzz4M"
+    }
+  ],
+  "movimentacoes": [
+    {
+      "id": "1",
+      "produto_id": "1",
+      "usuario_id": "1",
+      "tipo": "entrada",
+      "quantidade_movimentada": 50,
+      "data": "2026-09-01T10:00:00.000Z"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
