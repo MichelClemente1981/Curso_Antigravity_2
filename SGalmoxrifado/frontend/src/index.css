@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --fonte-principal: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fonte-mono: 'JetBrains Mono', monospace;
+
+  /* Paleta Canvas Escuro */
+  --canvas-bg: #090d16;
+  --canvas-dot: rgba(148, 163, 184, 0.14);
+  --card-bg: rgba(15, 23, 42, 0.82);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-hover-border: rgba(99, 102, 241, 0.4);
+
+  --cor-texto: #f8fafc;
+  --cor-texto-suave: #94a3b8;
+  --cor-texto-mutado: #64748b;
+
+  --cor-indigo: #6366f1;
+  --cor-azul: #3b82f6;
+  --cor-esmeralda: #10b981;
+  --cor-rubi: #f43f5e;
+  --cor-ambar: #f59e0b;
+
+  --sombra-canvas: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--card-border);
+  --sombra-dock: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--card-border);
+  --raio-card: 16px;
+  --raio-pills: 9999px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--fonte-principal);
+  background-color: var(--canvas-bg);
+  /* Fundo pontilhado tipo canvas de design */
+  background-image: radial-gradient(var(--canvas-dot) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  background-position: 0 0;
+  color: var(--cor-texto);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar estilizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #090d16;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}

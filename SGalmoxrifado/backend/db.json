@@ -3,12 +3,16 @@
     {
       "id": "1",
       "nome": "Carlos Silva",
-      "cargo": "Admin"
+      "cargo": "Admin",
+      "cidade": "São Paulo",
+      "pais": "Brasil"
     },
     {
       "id": "2",
       "nome": "Mariana Souza",
-      "cargo": "Operador"
+      "cargo": "Operador",
+      "cidade": "Curitiba",
+      "pais": "Brasil"
     }
   ],
   "produtos": [
@@ -16,25 +20,29 @@
       "id": "1",
       "nome": "Parafuso Sextavado M8",
       "sku": "PAR-M8-001",
-      "quantidade_estoque": 150
+      "quantidade_estoque": 120,
+      "imagem": "/produtos/parafuso.jpg"
     },
     {
       "id": "2",
       "nome": "Chave de Fenda Cruzada",
       "sku": "FER-CFD-002",
-      "quantidade_estoque": 25
+      "quantidade_estoque": 25,
+      "imagem": "/produtos/chave_fenda.jpg"
     },
     {
       "id": "3",
       "nome": "Fita Isolante 20m",
       "sku": "ELE-FIT-003",
-      "quantidade_estoque": 10
+      "quantidade_estoque": 10,
+      "imagem": "/produtos/fita_isolante.jpg"
     },
     {
-      "nome": "martelo",
-      "sku": "mto-1234",
-      "quantidade_estoque": 10,
-      "id": "L-em5sMzz4M"
+      "id": "4",
+      "nome": "Martelo Unha 27mm",
+      "sku": "FER-MAR-004",
+      "quantidade_estoque": 12,
+      "imagem": "/produtos/martelo.jpg"
     }
   ],
   "movimentacoes": [
@@ -45,6 +53,14 @@
       "tipo": "entrada",
       "quantidade_movimentada": 50,
       "data": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "produto_id": "1",
+      "usuario_id": "2",
+      "tipo": "saida",
+      "quantidade_movimentada": 30,
+      "data": "2026-10-03T17:59:10.884Z",
+      "id": "bUNr34xgSyk"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

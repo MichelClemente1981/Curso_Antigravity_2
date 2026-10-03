@@ -1,0 +1,11 @@
+{
+  "name": "sgalmoxrifado",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema de Gerenciamento de Almoxarifado (SGA)",
+  "scripts": {
+    "server": "npx json-server --watch backend/db.json --port 3000",
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build"
+  }
+}
