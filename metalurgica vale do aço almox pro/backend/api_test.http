@@ -1,0 +1,40 @@
+### Arquivo para teste de API usando a extensão REST Client do VS Code
+### Instale a extensão "REST Client" (humao.rest-client) e clique em "Send Request" acima de cada rota
+
+@baseUrl = http://localhost:8000
+
+### 1. Registrar uma nova movimentação (Entrada)
+POST {{baseUrl}}/api/movimentacoes
+Content-Type: application/json
+
+{
+    "item_codigo": "FERR-001",
+    "tipo": "ENTRADA",
+    "quantidade": 50,
+    "tecnico_matricula": "T-123",
+    "turno": "MANHA"
+}
+
+### 2. Registrar uma nova movimentação (Saída)
+POST {{baseUrl}}/api/movimentacoes
+Content-Type: application/json
+
+{
+    "item_codigo": "FERR-001",
+    "tipo": "SAIDA",
+    "quantidade": 5,
+    "tecnico_matricula": "T-456",
+    "turno": "TARDE"
+}
+
+### 3. Consultar Histórico de Movimentações (Sem filtros)
+GET {{baseUrl}}/api/movimentacoes/historico
+
+### 4. Consultar Histórico de Movimentações (Com filtros)
+GET {{baseUrl}}/api/movimentacoes/historico?tecnico_matricula=T-123&turno=MANHA
+
+### 5. Consultar Saldo de um Item Específico
+GET {{baseUrl}}/api/itens/FERR-001/saldo
+
+### 6. Listar Itens Abaixo do Estoque Mínimo (Alerta de Estoque)
+GET {{baseUrl}}/api/itens/alertas-estoque

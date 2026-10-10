@@ -1,0 +1,19 @@
+{
+    "name": "metalurgica/almoxarifadopro",
+    "description": "API REST para controle do Almoxarifado Central",
+    "type": "project",
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Engenheiro PHP"
+        }
+    ],
+    "minimum-stability": "stable"
+}
