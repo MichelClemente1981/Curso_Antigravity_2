@@ -1,0 +1,56 @@
+{
+  "version": "1.0",
+  "name": "TaskMaster IA",
+  "description": "Configuração de MCP e Skills para o Gerenciador de Tarefas",
+  "securityPolicies": {
+    "readOnly": {
+      "databases": true,
+      "filesystem": true
+    },
+    "forbiddenPatterns": [
+      "password",
+      "secret",
+      "JWT_KEY"
+    ],
+    "humanInTheLoop": {
+      "enabled": true,
+      "requireConfirmation": [
+        "database_write",
+        "git_commit"
+      ]
+    }
+  },
+  "mcpServers": {
+    "database_tarefas": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite",
+        "./database.sqlite"
+      ],
+      "description": "Acesso ao banco de dados de tarefas. Contém as tabelas de usuários e tasks.",
+      "settings": {
+        "enabled": true,
+        "timeout": 30000,
+        "retryAttempts": 3
+      }
+    },
+    "codigo_fonte_tarefas": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "./src"
+      ],
+      "description": "Leitura do código fonte da regra de negócios e interface da To-Do List.",
+      "settings": {
+        "enabled": true,
+        "readOnly": true,
+        "allowedPaths": [
+          "./src",
+          "./tests"
+        ]
+      }
+    }
+  }
+}
